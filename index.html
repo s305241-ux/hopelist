@@ -636,41 +636,74 @@
         }
 
         function handleRegister() {
-            const username = document.getElementById('register-username').value.trim();
-            const password = document.getElementById('register-password').value;
-            const passwordConfirm = document.getElementById('register-password-confirm').value;
+            try {
+                const username = document.getElementById('register-username').value.trim();
+                const password = document.getElementById('register-password').value;
+                const passwordConfirm = document.getElementById('register-password-confirm').value;
 
-            if (!username || !password) {
-                alert('ユーザー名とパスワードを入力してください。');
-                return;
-            }
-
-            if (password !== passwordConfirm) {
-                alert('パスワードが一致しません。');
-                return;
-            }
-
-            if (localStorage.getItem(getStorageKey(username))) {
-                alert('このユーザー名は既に使用されています。');
-                return;
-            }
-
-            const userData = {
-                password: password,
-                friends: [],
-                config: {
-                    action1: '電話',
-                    action2: 'メール',
-                    action3: 'SNS'
+                if (!username || username.length === 0) {
+                    alert('ユーザー名を入力してください。');
+                    return;
                 }
-            };
 
-            localStorage.setItem(getStorageKey(username), simpleEncrypt(JSON.stringify(userData)));
-            alert('新規登録に成功しました。ログインしてください。');
-            toggleAuthMode();
-            document.getElementById('register-username').value = '';
-            document.getElementById('register-password').value = '';
-            document.getElementById('register-password-confirm').value = '';
+                if (!password || password.length === 0) {
+                    alert('パスワードを入力してください。');
+                    return;
+                }
+
+                if (!passwordConfirm || passwordConfirm.length === 0) {
+                    alert('パスワード（確認）を入力してください。');
+                    return;
+                }
+
+                if (password !== passwordConfirm) {
+                    alert('パスワードが一致しません。');
+                    return;
+                }
+
+                if (password.length < 3) {
+                    alert('パスワードは3文字以上で設定してください。');
+                    return;
+                }
+
+                if (localStorage.getItem(getStorageKey(username))) {
+                    alert('このユーザー名は既に使用されています。別のユーザー名をお試しください。');
+                    return;
+                }
+
+                const userData = {
+                    password: password,
+                    friends: [],
+                    config: {
+                        action1: '電話',
+                        action2: 'メール',
+                        action3: 'SNS'
+                    }
+                };
+
+                const encrypted = simpleEncrypt(JSON.stringify(userData));
+                localStorage.setItem(getStorageKey(username), encrypted);
+                
+                // 保存確認
+                const verify = localStorage.getItem(getStorageKey(username));
+                if (!verify) {
+                    alert('データの保存に失敗しました。ブラウザのストレージをご確認ください。');
+                    return;
+                }
+
+                alert('新規登録に成功しました。ログインしてください。');
+                toggleAuthMode();
+                document.getElementById('register-username').value = '';
+                document.getElementById('register-password').value = '';
+                document.getElementById('register-password-confirm').value = '';
+                // ログインフォームをフォーカス
+                setTimeout(() => {
+                    document.getElementById('login-username').focus();
+                }, 100);
+            } catch (error) {
+                console.error('Registration error:', error);
+                alert('新規登録中にエラーが発生しました: ' + error.message);
+            }
         }
 
         function handleLogout() {
