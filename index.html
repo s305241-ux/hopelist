@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HopeList - 友人台帳 v2</title>
+    <title>HopeList - 友人台帳</title>
     <style>
         * {
             margin: 0;
@@ -17,12 +17,6 @@
             color: #e2e8f0;
             line-height: 1.6;
             min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 1rem;
         }
 
         /* ===== ログイン画面 ===== */
@@ -71,9 +65,12 @@
             margin-bottom: 0.5rem;
             font-weight: 500;
             color: #cbd5e1;
+            font-size: 0.9rem;
         }
 
-        .form-group input {
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
             width: 100%;
             padding: 0.75rem;
             border: 1px solid rgba(71, 85, 105, 0.3);
@@ -82,12 +79,20 @@
             color: #e2e8f0;
             font-size: 1rem;
             transition: all 0.3s;
+            font-family: inherit;
         }
 
-        .form-group input:focus {
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
             outline: none;
             border-color: #3b82f6;
             box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+        }
+
+        .form-group select option {
+            background: #1e293b;
+            color: #e2e8f0;
         }
 
         .btn {
@@ -146,6 +151,12 @@
             display: none;
         }
 
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
         .header {
             display: flex;
             justify-content: space-between;
@@ -180,14 +191,14 @@
             border-radius: 0.375rem;
         }
 
-        .btn-logout {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-            border: 1px solid #ef4444;
+        .btn-add {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
         }
 
-        .btn-logout:hover {
-            background: rgba(239, 68, 68, 0.2);
+        .btn-add:hover {
+            transform: translateY(-2px);
         }
 
         .btn-config {
@@ -200,20 +211,50 @@
             background: rgba(59, 130, 246, 0.2);
         }
 
-        .btn-add {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            border: none;
+        .btn-logout {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid #ef4444;
         }
 
-        .btn-add:hover {
-            transform: translateY(-2px);
+        .btn-logout:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        /* ===== ソート・列管理 ===== */
+        .sort-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .sort-bar label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+        }
+
+        .sort-bar select {
+            padding: 0.5rem;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            border-radius: 0.375rem;
+            color: #e2e8f0;
+            cursor: pointer;
         }
 
         /* ===== テーブル ===== */
         .table-wrapper {
             overflow-x: auto;
             margin: 2rem 0;
+            border-radius: 0.5rem;
         }
 
         table {
@@ -221,31 +262,41 @@
             border-collapse: collapse;
             background: rgba(30, 41, 59, 0.8);
             border: 1px solid rgba(71, 85, 105, 0.3);
-            border-radius: 0.5rem;
             overflow: hidden;
         }
 
         thead {
             background: rgba(15, 23, 42, 0.95);
             border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+            position: sticky;
+            top: 0;
         }
 
         th {
-            padding: 1rem;
+            padding: 0.75rem 0.5rem;
             text-align: left;
             font-weight: 600;
             color: #60a5fa;
             border-right: 1px solid rgba(71, 85, 105, 0.2);
+            font-size: 0.85rem;
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
         }
 
         th:last-child {
             border-right: none;
         }
 
+        th:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
         td {
-            padding: 1rem;
+            padding: 0.75rem 0.5rem;
             border-right: 1px solid rgba(71, 85, 105, 0.2);
             border-bottom: 1px solid rgba(71, 85, 105, 0.1);
+            font-size: 0.9rem;
         }
 
         td:last-child {
@@ -258,18 +309,43 @@
 
         .action-cell {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.25rem;
+            justify-content: center;
+        }
+
+        .circle-btn {
+            width: 32px;
+            height: 32px;
+            border: 2px solid #3b82f6;
+            border-radius: 50%;
+            background: transparent;
+            color: #3b82f6;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .circle-btn.checked {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .circle-btn:hover {
+            transform: scale(1.1);
         }
 
         .icon-btn {
+            padding: 0.5rem 0.75rem;
             background: rgba(59, 130, 246, 0.1);
             color: #60a5fa;
             border: none;
-            padding: 0.5rem 0.75rem;
             border-radius: 0.375rem;
             cursor: pointer;
             transition: all 0.3s;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .icon-btn:hover {
@@ -279,26 +355,19 @@
         .icon-btn-delete {
             background: rgba(239, 68, 68, 0.1);
             color: #ef4444;
-            border: none;
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 0.9rem;
         }
 
         .icon-btn-delete:hover {
             background: rgba(239, 68, 68, 0.2);
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: #94a3b8;
+        .total-row {
+            background: rgba(15, 23, 42, 0.95);
+            font-weight: bold;
         }
 
-        .empty-state p {
-            margin-bottom: 1rem;
+        .total-row td {
+            border-bottom: none;
         }
 
         /* ===== モーダル ===== */
@@ -314,6 +383,7 @@
             align-items: center;
             justify-content: center;
             padding: 1rem;
+            overflow-y: auto;
         }
 
         .modal.active {
@@ -325,10 +395,11 @@
             border: 1px solid rgba(71, 85, 105, 0.3);
             border-radius: 1rem;
             padding: 2rem;
-            max-width: 600px;
+            max-width: 700px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
+            margin: auto;
         }
 
         .modal-header {
@@ -378,6 +449,10 @@
             grid-template-columns: 1fr;
         }
 
+        .form-row.triple {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
         .modal-buttons {
             display: flex;
             gap: 1rem;
@@ -396,32 +471,35 @@
                 align-items: flex-start;
             }
 
-            .user-info {
-                width: 100%;
-            }
-
             .action-buttons {
                 width: 100%;
             }
 
             .action-buttons button {
                 flex: 1;
+                min-width: 0;
             }
 
             table {
-                font-size: 0.9rem;
+                font-size: 0.8rem;
             }
 
             th, td {
-                padding: 0.75rem;
+                padding: 0.5rem 0.25rem;
             }
 
-            .form-row {
+            .form-row,
+            .form-row.triple {
                 grid-template-columns: 1fr;
             }
 
-            .action-cell {
+            .sort-bar {
                 flex-direction: column;
+                align-items: stretch;
+            }
+
+            .sort-bar select {
+                width: 100%;
             }
         }
     </style>
@@ -482,9 +560,20 @@
                 </div>
                 <div class="action-buttons">
                     <button class="btn btn-sm btn-add" onclick="openAddModal()">➕ 友人を追加</button>
-                    <button class="btn btn-sm btn-config" onclick="openConfigModal()">⚙️ アクション設定</button>
+                    <button class="btn btn-sm btn-config" onclick="openConfigModal()">⚙️ 列設定</button>
                     <button class="btn btn-sm btn-logout" onclick="handleLogout()">ログアウト</button>
                 </div>
+            </div>
+
+            <div class="sort-bar">
+                <label>ソート: 
+                    <select id="sort-column" onchange="renderTable()">
+                        <option value="">なし</option>
+                        <option value="name">氏名</option>
+                        <option value="prefecture">都道府県</option>
+                        <option value="combined">住所</option>
+                    </select>
+                </label>
             </div>
 
             <div id="table-container"></div>
@@ -505,38 +594,110 @@
                     <label>氏名 <span style="color: #ef4444;">*</span></label>
                     <input type="text" id="friend-name" placeholder="例：山田太郎">
                 </div>
+                <div class="form-group">
+                    <label>電話番号</label>
+                    <input type="tel" id="friend-phone" placeholder="例：090-1234-5678">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>住所</h3>
+                <div class="form-group">
+                    <label>都道府県 <span style="color: #ef4444;">*</span></label>
+                    <select id="friend-prefecture">
+                        <option value="">選択してください</option>
+                        <option value="北海道">北海道</option>
+                        <option value="青森県">青森県</option>
+                        <option value="岩手県">岩手県</option>
+                        <option value="宮城県">宮城県</option>
+                        <option value="秋田県">秋田県</option>
+                        <option value="山形県">山形県</option>
+                        <option value="福島県">福島県</option>
+                        <option value="茨城県">茨城県</option>
+                        <option value="栃木県">栃木県</option>
+                        <option value="群馬県">群馬県</option>
+                        <option value="埼玉県">埼玉県</option>
+                        <option value="千葉県">千葉県</option>
+                        <option value="東京都">東京都</option>
+                        <option value="神奈川県">神奈川県</option>
+                        <option value="新潟県">新潟県</option>
+                        <option value="富山県">富山県</option>
+                        <option value="石川県">石川県</option>
+                        <option value="福井県">福井県</option>
+                        <option value="山梨県">山梨県</option>
+                        <option value="長野県">長野県</option>
+                        <option value="岐阜県">岐阜県</option>
+                        <option value="静岡県">静岡県</option>
+                        <option value="愛知県">愛知県</option>
+                        <option value="三重県">三重県</option>
+                        <option value="滋賀県">滋賀県</option>
+                        <option value="京都府">京都府</option>
+                        <option value="大阪府">大阪府</option>
+                        <option value="兵庫県">兵庫県</option>
+                        <option value="奈良県">奈良県</option>
+                        <option value="和歌山県">和歌山県</option>
+                        <option value="鳥取県">鳥取県</option>
+                        <option value="島根県">島根県</option>
+                        <option value="岡山県">岡山県</option>
+                        <option value="広島県">広島県</option>
+                        <option value="山口県">山口県</option>
+                        <option value="徳島県">徳島県</option>
+                        <option value="香川県">香川県</option>
+                        <option value="愛媛県">愛媛県</option>
+                        <option value="高知県">高知県</option>
+                        <option value="福岡県">福岡県</option>
+                        <option value="佐賀県">佐賀県</option>
+                        <option value="長崎県">長崎県</option>
+                        <option value="熊本県">熊本県</option>
+                        <option value="大分県">大分県</option>
+                        <option value="宮崎県">宮崎県</option>
+                        <option value="鹿児島県">鹿児島県</option>
+                        <option value="沖縄県">沖縄県</option>
+                    </select>
+                </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>住所（都道府県） <span style="color: #ef4444;">*</span></label>
-                        <input type="text" id="friend-prefecture" placeholder="例：東京都">
+                        <label>市町村</label>
+                        <input type="text" id="friend-city" placeholder="例：渋谷区">
                     </div>
                     <div class="form-group">
-                        <label>住所（市区町村）</label>
-                        <input type="text" id="friend-city" placeholder="例：渋谷区">
+                        <label>区</label>
+                        <input type="text" id="friend-ward" placeholder="例：渋谷">
                     </div>
                 </div>
             </div>
 
             <div class="form-section">
                 <h3>アクション</h3>
+                <p style="color: #cbd5e1; margin-bottom: 1rem; font-size: 0.9rem;">アクション１～３はチェック項目、アクション４は自由記述欄です</p>
                 <div class="form-group">
-                    <label id="action1-label">電話</label>
-                    <input type="text" id="friend-action1" placeholder="">
+                    <label id="action1-label">アクション1</label>
+                    <div style="text-align: center; margin-top: 0.5rem;">
+                        <input type="checkbox" id="friend-action1" style="width: 20px; height: 20px; cursor: pointer;">
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label id="action2-label">メール</label>
-                    <input type="text" id="friend-action2" placeholder="">
+                    <label id="action2-label">アクション2</label>
+                    <div style="text-align: center; margin-top: 0.5rem;">
+                        <input type="checkbox" id="friend-action2" style="width: 20px; height: 20px; cursor: pointer;">
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label id="action3-label">備考</label>
-                    <input type="text" id="friend-action3" placeholder="">
+                    <label id="action3-label">アクション3</label>
+                    <div style="text-align: center; margin-top: 0.5rem;">
+                        <input type="checkbox" id="friend-action3" style="width: 20px; height: 20px; cursor: pointer;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label id="action4-label">アクション4</label>
+                    <input type="text" id="friend-action4" placeholder="自由に記入してください">
                 </div>
             </div>
 
             <div class="form-section">
                 <h3>備考</h3>
                 <div class="form-group full">
-                    <textarea id="friend-memo" placeholder="その他の備考を入力してください" style="width: 100%; padding: 0.75rem; border: 1px solid rgba(71, 85, 105, 0.3); border-radius: 0.5rem; background: rgba(15, 23, 42, 0.8); color: #e2e8f0; font-family: inherit; resize: vertical; min-height: 100px;"></textarea>
+                    <textarea id="friend-memo" placeholder="その他の備考を入力してください" style="min-height: 100px;"></textarea>
                 </div>
             </div>
 
@@ -547,27 +708,70 @@
         </div>
     </div>
 
-    <!-- アクション設定モーダル -->
+    <!-- 列設定モーダル -->
     <div id="config-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>アクション設定</h2>
+                <h2>列設定</h2>
                 <button class="modal-close" onclick="closeConfigModal()">✕</button>
             </div>
             
-            <p style="color: #cbd5e1; margin-bottom: 1.5rem;">各アクション項目の名前をカスタマイズできます。</p>
+            <p style="color: #cbd5e1; margin-bottom: 1.5rem;">各列を表示/非表示に設定し、アクション項目の名前をカスタマイズできます。</p>
 
-            <div class="form-group">
-                <label>アクション1</label>
-                <input type="text" id="config-action1" placeholder="例：電話">
+            <div class="form-section">
+                <h3>表示列</h3>
+                <div style="display: grid; gap: 0.5rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="col-name" checked> 氏名
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="col-phone" checked> 電話番号
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="col-prefecture" checked> 都道府県
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="col-city" checked> 市町村
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="col-ward" checked> 区
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="col-action1" checked> アクション1
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="col-action2" checked> アクション2
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="col-action3" checked> アクション3
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="col-action4" checked> アクション4
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="col-memo" checked> 備考
+                    </label>
+                </div>
             </div>
-            <div class="form-group">
-                <label>アクション2</label>
-                <input type="text" id="config-action2" placeholder="例：メール">
-            </div>
-            <div class="form-group">
-                <label>アクション3</label>
-                <input type="text" id="config-action3" placeholder="例：SNS">
+
+            <div class="form-section">
+                <h3>アクション項目名</h3>
+                <div class="form-group">
+                    <label>アクション1</label>
+                    <input type="text" id="config-action1" placeholder="例：電話">
+                </div>
+                <div class="form-group">
+                    <label>アクション2</label>
+                    <input type="text" id="config-action2" placeholder="例：メール">
+                </div>
+                <div class="form-group">
+                    <label>アクション3</label>
+                    <input type="text" id="config-action3" placeholder="例：SNS">
+                </div>
+                <div class="form-group">
+                    <label>アクション4</label>
+                    <input type="text" id="config-action4" placeholder="例：備考欄">
+                </div>
             </div>
 
             <div class="modal-buttons">
@@ -579,11 +783,8 @@
 
     <script>
         // ===== ユーティリティ関数 =====
-        const crypto_key = 'hopelist_secret_key_2026';
-
         function simpleEncrypt(text) {
             try {
-                // UTF-8をサポートするためにencodeURIComponentを使用
                 return btoa(unescape(encodeURIComponent(text)));
             } catch (error) {
                 console.error('Encryption error:', error);
@@ -593,7 +794,6 @@
 
         function simpleDecrypt(text) {
             try {
-                // UTF-8をサポートするためにdecodeURIComponentを使用
                 return decodeURIComponent(escape(atob(text)));
             } catch (error) {
                 console.error('Decryption error:', error);
@@ -616,21 +816,21 @@
         }
 
         function handleLogin() {
-            const username = document.getElementById('login-username').value.trim();
-            const password = document.getElementById('login-password').value;
-
-            if (!username || !password) {
-                alert('ユーザー名とパスワードを入力してください。');
-                return;
-            }
-
-            const stored = localStorage.getItem(getStorageKey(username));
-            if (!stored) {
-                alert('ユーザーが見つかりません。');
-                return;
-            }
-
             try {
+                const username = document.getElementById('login-username').value.trim();
+                const password = document.getElementById('login-password').value;
+
+                if (!username || !password) {
+                    alert('ユーザー名とパスワードを入力してください。');
+                    return;
+                }
+
+                const stored = localStorage.getItem(getStorageKey(username));
+                if (!stored) {
+                    alert('ユーザーが見つかりません。');
+                    return;
+                }
+
                 const userData = JSON.parse(simpleDecrypt(stored));
                 if (userData.password === password) {
                     sessionStorage.setItem('currentUser', username);
@@ -638,8 +838,8 @@
                 } else {
                     alert('パスワードが正しくありません。');
                 }
-            } catch {
-                alert('ユーザー情報の読み込みに失敗しました。');
+            } catch (error) {
+                alert('ログイン中にエラーが発生しました: ' + error.message);
             }
         }
 
@@ -685,14 +885,26 @@
                     config: {
                         action1: '電話',
                         action2: 'メール',
-                        action3: 'SNS'
+                        action3: 'SNS',
+                        action4: '備考',
+                        columns: {
+                            name: true,
+                            phone: true,
+                            prefecture: true,
+                            city: true,
+                            ward: true,
+                            action1: true,
+                            action2: true,
+                            action3: true,
+                            action4: true,
+                            memo: true
+                        }
                     }
                 };
 
                 const encrypted = simpleEncrypt(JSON.stringify(userData));
                 localStorage.setItem(getStorageKey(username), encrypted);
                 
-                // 保存確認
                 const verify = localStorage.getItem(getStorageKey(username));
                 if (!verify) {
                     alert('データの保存に失敗しました。ブラウザのストレージをご確認ください。');
@@ -704,7 +916,6 @@
                 document.getElementById('register-username').value = '';
                 document.getElementById('register-password').value = '';
                 document.getElementById('register-password-confirm').value = '';
-                // ログインフォームをフォーカス
                 setTimeout(() => {
                     document.getElementById('login-username').focus();
                 }, 100);
@@ -748,40 +959,102 @@
             localStorage.setItem(getStorageKey(username), simpleEncrypt(JSON.stringify(data)));
         }
 
+        function loadConfigLabels() {
+            const data = getUserData();
+            const config = data.config;
+            document.getElementById('action1-label').textContent = config.action1 || 'アクション1';
+            document.getElementById('action2-label').textContent = config.action2 || 'アクション2';
+            document.getElementById('action3-label').textContent = config.action3 || 'アクション3';
+            document.getElementById('action4-label').textContent = config.action4 || 'アクション4';
+        }
+
         function renderTable() {
             const data = getUserData();
             const config = data.config;
             const friends = data.friends || [];
+            const cols = config.columns || {};
+
+            // ソート処理
+            const sortColumn = document.getElementById('sort-column').value;
+            let sortedFriends = [...friends];
+            
+            if (sortColumn === 'name') {
+                sortedFriends.sort((a, b) => a.name.localeCompare(b.name, 'ja'));
+            } else if (sortColumn === 'prefecture') {
+                sortedFriends.sort((a, b) => a.prefecture.localeCompare(b.prefecture, 'ja'));
+            } else if (sortColumn === 'combined') {
+                sortedFriends.sort((a, b) => {
+                    const addrA = (a.prefecture || '') + (a.city || '') + (a.ward || '');
+                    const addrB = (b.prefecture || '') + (b.city || '') + (b.ward || '');
+                    return addrA.localeCompare(addrB, 'ja');
+                });
+            }
 
             let html = '<div class="table-wrapper"><table><thead><tr>';
-            html += '<th>氏名</th>';
-            html += '<th>住所（都道府県）</th>';
-            html += '<th>住所（市区町村）</th>';
-            html += `<th>${config.action1 || 'アクション1'}</th>`;
-            html += `<th>${config.action2 || 'アクション2'}</th>`;
-            html += `<th>${config.action3 || 'アクション3'}</th>`;
-            html += '<th>備考</th>';
-            html += '<th>操作</th></tr></thead><tbody>';
+            
+            // ヘッダー行
+            if (cols.name !== false) html += `<th onclick="sortColumn('name')">氏名</th>`;
+            if (cols.phone !== false) html += `<th onclick="sortColumn('phone')">電話</th>`;
+            if (cols.prefecture !== false) html += `<th onclick="sortColumn('prefecture')">都道府県</th>`;
+            if (cols.city !== false) html += `<th onclick="sortColumn('city')">市町村</th>`;
+            if (cols.ward !== false) html += `<th onclick="sortColumn('ward')">区</th>`;
+            if (cols.action1 !== false) html += `<th>${config.action1}</th>`;
+            if (cols.action2 !== false) html += `<th>${config.action2}</th>`;
+            if (cols.action3 !== false) html += `<th>${config.action3}</th>`;
+            if (cols.action4 !== false) html += `<th>${config.action4}</th>`;
+            if (cols.memo !== false) html += `<th>備考</th>`;
+            html += `<th>操作</th></tr></thead><tbody>`;
 
-            if (friends.length === 0) {
-                html += '<tr><td colspan="8" style="text-align: center; padding: 2rem; color: #94a3b8;">友人がまだ登録されていません。「友人を追加」ボタンから初めての友人を追加してください。</td></tr>';
+            // データ行
+            let totals = {
+                action1: 0,
+                action2: 0,
+                action3: 0
+            };
+
+            if (sortedFriends.length === 0) {
+                html += `<tr><td colspan="100" style="text-align: center; padding: 2rem; color: #94a3b8;">友人がまだ登録されていません。</td></tr>`;
             } else {
-                friends.forEach((friend, index) => {
+                sortedFriends.forEach((friend, index) => {
                     html += '<tr>';
-                    html += `<td>${escapeHtml(friend.name)}</td>`;
-                    html += `<td>${escapeHtml(friend.prefecture)}</td>`;
-                    html += `<td>${escapeHtml(friend.city || '-')}</td>`;
-                    html += `<td>${escapeHtml(friend.action1 || '-')}</td>`;
-                    html += `<td>${escapeHtml(friend.action2 || '-')}</td>`;
-                    html += `<td>${escapeHtml(friend.action3 || '-')}</td>`;
-                    html += `<td>${escapeHtml(friend.memo || '-')}</td>`;
-                    html += '<td><div class="action-cell">';
-                    html += `<button class="icon-btn" onclick="editFriend(${index})">✎ 編集</button>`;
-                    html += `<button class="icon-btn icon-btn-delete" onclick="deleteFriend(${index})">🗑 削除</button>`;
-                    html += '</div></td>';
+                    if (cols.name !== false) html += `<td>${escapeHtml(friend.name)}</td>`;
+                    if (cols.phone !== false) html += `<td>${escapeHtml(friend.phone || '-')}</td>`;
+                    if (cols.prefecture !== false) html += `<td>${escapeHtml(friend.prefecture)}</td>`;
+                    if (cols.city !== false) html += `<td>${escapeHtml(friend.city || '-')}</td>`;
+                    if (cols.ward !== false) html += `<td>${escapeHtml(friend.ward || '-')}</td>`;
+                    
+                    if (cols.action1 !== false) {
+                        html += `<td><div class="action-cell"><button class="circle-btn ${friend.action1 ? 'checked' : ''}" onclick="toggleAction(${friends.indexOf(friend)}, 'action1')">○</button></div></td>`;
+                        if (friend.action1) totals.action1++;
+                    }
+                    if (cols.action2 !== false) {
+                        html += `<td><div class="action-cell"><button class="circle-btn ${friend.action2 ? 'checked' : ''}" onclick="toggleAction(${friends.indexOf(friend)}, 'action2')">○</button></div></td>`;
+                        if (friend.action2) totals.action2++;
+                    }
+                    if (cols.action3 !== false) {
+                        html += `<td><div class="action-cell"><button class="circle-btn ${friend.action3 ? 'checked' : ''}" onclick="toggleAction(${friends.indexOf(friend)}, 'action3')">○</button></div></td>`;
+                        if (friend.action3) totals.action3++;
+                    }
+                    if (cols.action4 !== false) html += `<td>${escapeHtml(friend.action4 || '-')}</td>`;
+                    if (cols.memo !== false) html += `<td>${escapeHtml(friend.memo || '-')}</td>`;
+                    html += `<td><div class="action-cell"><button class="icon-btn" onclick="editFriend(${friends.indexOf(friend)})">✎</button><button class="icon-btn icon-btn-delete" onclick="deleteFriend(${friends.indexOf(friend)})">🗑</button></div></td>`;
                     html += '</tr>';
                 });
             }
+
+            // 合計行
+            html += '<tr class="total-row">';
+            if (cols.name !== false) html += `<td>合計</td>`;
+            if (cols.phone !== false) html += `<td></td>`;
+            if (cols.prefecture !== false) html += `<td></td>`;
+            if (cols.city !== false) html += `<td></td>`;
+            if (cols.ward !== false) html += `<td></td>`;
+            if (cols.action1 !== false) html += `<td style="text-align: center;">${totals.action1}</td>`;
+            if (cols.action2 !== false) html += `<td style="text-align: center;">${totals.action2}</td>`;
+            if (cols.action3 !== false) html += `<td style="text-align: center;">${totals.action3}</td>`;
+            if (cols.action4 !== false) html += `<td></td>`;
+            if (cols.memo !== false) html += `<td></td>`;
+            html += `<td></td></tr>`;
 
             html += '</tbody></table></div>';
             document.getElementById('table-container').innerHTML = html;
@@ -793,7 +1066,21 @@
             return div.innerHTML;
         }
 
-        // ===== friend modal =====
+        function sortColumn(col) {
+            const sortSelect = document.getElementById('sort-column');
+            if (col === 'name') sortSelect.value = 'name';
+            else if (col === 'prefecture') sortSelect.value = 'prefecture';
+            renderTable();
+        }
+
+        function toggleAction(index, action) {
+            const data = getUserData();
+            data.friends[index][action] = !data.friends[index][action];
+            saveUserData(data);
+            renderTable();
+        }
+
+        // ===== Friend Modal =====
         function openAddModal() {
             document.getElementById('modal-title').textContent = '友人を追加';
             clearFriendForm();
@@ -807,11 +1094,14 @@
 
         function clearFriendForm() {
             document.getElementById('friend-name').value = '';
+            document.getElementById('friend-phone').value = '';
             document.getElementById('friend-prefecture').value = '';
             document.getElementById('friend-city').value = '';
-            document.getElementById('friend-action1').value = '';
-            document.getElementById('friend-action2').value = '';
-            document.getElementById('friend-action3').value = '';
+            document.getElementById('friend-ward').value = '';
+            document.getElementById('friend-action1').checked = false;
+            document.getElementById('friend-action2').checked = false;
+            document.getElementById('friend-action3').checked = false;
+            document.getElementById('friend-action4').value = '';
             document.getElementById('friend-memo').value = '';
         }
 
@@ -821,11 +1111,14 @@
 
             document.getElementById('modal-title').textContent = '友人を編集';
             document.getElementById('friend-name').value = friend.name;
+            document.getElementById('friend-phone').value = friend.phone || '';
             document.getElementById('friend-prefecture').value = friend.prefecture;
             document.getElementById('friend-city').value = friend.city || '';
-            document.getElementById('friend-action1').value = friend.action1 || '';
-            document.getElementById('friend-action2').value = friend.action2 || '';
-            document.getElementById('friend-action3').value = friend.action3 || '';
+            document.getElementById('friend-ward').value = friend.ward || '';
+            document.getElementById('friend-action1').checked = friend.action1 || false;
+            document.getElementById('friend-action2').checked = friend.action2 || false;
+            document.getElementById('friend-action3').checked = friend.action3 || false;
+            document.getElementById('friend-action4').value = friend.action4 || '';
             document.getElementById('friend-memo').value = friend.memo || '';
 
             window.editingIndex = index;
@@ -837,18 +1130,21 @@
             const prefecture = document.getElementById('friend-prefecture').value.trim();
 
             if (!name || !prefecture) {
-                alert('氏名と住所（都道府県）は必須です。');
+                alert('氏名と都道府県は必須です。');
                 return;
             }
 
             const data = getUserData();
             const friend = {
                 name: name,
+                phone: document.getElementById('friend-phone').value.trim(),
                 prefecture: prefecture,
                 city: document.getElementById('friend-city').value.trim(),
-                action1: document.getElementById('friend-action1').value.trim(),
-                action2: document.getElementById('friend-action2').value.trim(),
-                action3: document.getElementById('friend-action3').value.trim(),
+                ward: document.getElementById('friend-ward').value.trim(),
+                action1: document.getElementById('friend-action1').checked,
+                action2: document.getElementById('friend-action2').checked,
+                action3: document.getElementById('friend-action3').checked,
+                action4: document.getElementById('friend-action4').value.trim(),
                 memo: document.getElementById('friend-memo').value.trim()
             };
 
@@ -872,21 +1168,28 @@
             }
         }
 
-        // ===== config modal =====
-        function loadConfigLabels() {
-            const data = getUserData();
-            const config = data.config;
-            document.getElementById('action1-label').textContent = config.action1 || 'アクション1';
-            document.getElementById('action2-label').textContent = config.action2 || 'アクション2';
-            document.getElementById('action3-label').textContent = config.action3 || 'アクション3';
-        }
-
+        // ===== Config Modal =====
         function openConfigModal() {
             const data = getUserData();
             const config = data.config;
+            const cols = config.columns || {};
+
             document.getElementById('config-action1').value = config.action1 || '電話';
             document.getElementById('config-action2').value = config.action2 || 'メール';
             document.getElementById('config-action3').value = config.action3 || 'SNS';
+            document.getElementById('config-action4').value = config.action4 || '備考';
+
+            document.getElementById('col-name').checked = cols.name !== false;
+            document.getElementById('col-phone').checked = cols.phone !== false;
+            document.getElementById('col-prefecture').checked = cols.prefecture !== false;
+            document.getElementById('col-city').checked = cols.city !== false;
+            document.getElementById('col-ward').checked = cols.ward !== false;
+            document.getElementById('col-action1').checked = cols.action1 !== false;
+            document.getElementById('col-action2').checked = cols.action2 !== false;
+            document.getElementById('col-action3').checked = cols.action3 !== false;
+            document.getElementById('col-action4').checked = cols.action4 !== false;
+            document.getElementById('col-memo').checked = cols.memo !== false;
+
             document.getElementById('config-modal').classList.add('active');
         }
 
@@ -896,11 +1199,24 @@
 
         function saveConfig() {
             const data = getUserData();
-            data.config = {
-                action1: document.getElementById('config-action1').value.trim() || 'アクション1',
-                action2: document.getElementById('config-action2').value.trim() || 'アクション2',
-                action3: document.getElementById('config-action3').value.trim() || 'アクション3'
+            data.config.action1 = document.getElementById('config-action1').value.trim() || 'アクション1';
+            data.config.action2 = document.getElementById('config-action2').value.trim() || 'アクション2';
+            data.config.action3 = document.getElementById('config-action3').value.trim() || 'アクション3';
+            data.config.action4 = document.getElementById('config-action4').value.trim() || 'アクション4';
+            
+            data.config.columns = {
+                name: document.getElementById('col-name').checked,
+                phone: document.getElementById('col-phone').checked,
+                prefecture: document.getElementById('col-prefecture').checked,
+                city: document.getElementById('col-city').checked,
+                ward: document.getElementById('col-ward').checked,
+                action1: document.getElementById('col-action1').checked,
+                action2: document.getElementById('col-action2').checked,
+                action3: document.getElementById('col-action3').checked,
+                action4: document.getElementById('col-action4').checked,
+                memo: document.getElementById('col-memo').checked
             };
+
             saveUserData(data);
             closeConfigModal();
             loadConfigLabels();
@@ -917,4 +1233,3 @@
     </script>
 </body>
 </html>
-
