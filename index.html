@@ -1035,7 +1035,7 @@
                         html += `<td><div class="action-cell"><button class="circle-btn ${friend.action3 ? 'checked' : ''}" onclick="toggleAction(${friends.indexOf(friend)}, 'action3')">○</button></div></td>`;
                         if (friend.action3) totals.action3++;
                     }
-                    if (cols.action4 !== false) html += `<td>${escapeHtml(friend.action4 || '-')}</td>`;
+                    if (cols.action4 !== false) html += `<td class="editable-action4" data-index="${friends.indexOf(friend)}" onclick="editAction4InlineClick(event)" style="cursor: pointer; padding: 0.5rem; user-select: none;"><span class="action4-display">${escapeHtml(friend.action4 || '-')}</span></td>`;
                     if (cols.memo !== false) html += `<td>${escapeHtml(friend.memo || '-')}</td>`;
                     html += `<td><div class="action-cell"><button class="icon-btn" onclick="editFriend(${friends.indexOf(friend)})">✎</button><button class="icon-btn icon-btn-delete" onclick="deleteFriend(${friends.indexOf(friend)})">🗑</button></div></td>`;
                     html += '</tr>';
@@ -1078,6 +1078,47 @@
             data.friends[index][action] = !data.friends[index][action];
             saveUserData(data);
             renderTable();
+        }
+
+        function editAction4InlineClick(event) {
+            const cell = event.currentTarget;
+            const index = parseInt(cell.getAttribute('data-index'));
+            const data = getUserData();
+            const currentValue = data.friends[index].action4 || '';
+
+            // セルの内容を入力フィールドに置き換える
+            cell.innerHTML = `<input type="text" class="action4-inline-edit" value="${escapeHtml(currentValue)}" style="width: 100%; padding: 0.25rem; border: 1px solid #3b82f6; background: rgba(15, 23, 42, 0.8); color: #e2e8f0; border-radius: 0.25rem;">`;
+            
+            const input = cell.querySelector('.action4-inline-edit');
+            input.focus();
+            input.select();
+
+            function saveAction4(value) {
+                data.friends[index].action4 = value.trim();
+                saveUserData(data);
+                renderTable();
+            }
+
+            function cancelEdit() {
+                renderTable();
+            }
+
+            input.addEventListener('blur', (e) => {
+                saveAction4(input.value);
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    saveAction4(input.value);
+                } else if (e.key === 'Escape') {
+                    cancelEdit();
+                }
+            });
+
+            // クリックがセルから出ないようにする
+            cell.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
         }
 
         // ===== Friend Modal =====
