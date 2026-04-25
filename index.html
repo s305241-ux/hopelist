@@ -582,13 +582,21 @@
         const crypto_key = 'hopelist_secret_key_2026';
 
         function simpleEncrypt(text) {
-            return btoa(text);
+            try {
+                // UTF-8をサポートするためにencodeURIComponentを使用
+                return btoa(unescape(encodeURIComponent(text)));
+            } catch (error) {
+                console.error('Encryption error:', error);
+                throw new Error('データの暗号化に失敗しました');
+            }
         }
 
         function simpleDecrypt(text) {
             try {
-                return atob(text);
-            } catch {
+                // UTF-8をサポートするためにdecodeURIComponentを使用
+                return decodeURIComponent(escape(atob(text)));
+            } catch (error) {
+                console.error('Decryption error:', error);
                 return text;
             }
         }
