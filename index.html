@@ -177,6 +177,13 @@
 
         .user-info span {
             color: #cbd5e1;
+            font-size: 1rem;
+        }
+
+        .user-info #username-display {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #ffffff;
         }
 
         .action-buttons {
@@ -250,21 +257,23 @@
             cursor: pointer;
         }
 
-        .table-actions {
-            display: flex;
-            justify-content: flex-end;
+        .table-action-row {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            align-items: center;
             margin-bottom: 1rem;
             gap: 0.5rem;
         }
 
-        .table-add-row {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 1rem;
+        .table-action-row .btn-add {
+            justify-self: center;
         }
 
-        .table-actions .btn,
-        .table-add-row .btn {
+        .table-action-row .btn-config {
+            justify-self: end;
+        }
+
+        .table-action-row .btn {
             width: auto;
         }
 
@@ -594,11 +603,9 @@
                 </label>
             </div>
 
-            <div class="table-add-row">
+            <div class="table-action-row">
+                <div></div>
                 <button class="btn btn-sm btn-add" onclick="openAddModal()">➕ 友人を追加</button>
-            </div>
-
-            <div class="table-actions">
                 <button class="btn btn-sm btn-config" onclick="openConfigModal()">⚙️ 列設定</button>
             </div>
 
@@ -684,11 +691,11 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>市町村</label>
-                        <input type="text" id="friend-city" placeholder="例：渋谷区">
+                        <input type="text" id="friend-city" placeholder="例：北九州市">
                     </div>
                     <div class="form-group">
                         <label>区</label>
-                        <input type="text" id="friend-ward" placeholder="例：渋谷">
+                        <input type="text" id="friend-ward" placeholder="例：小倉北区">
                     </div>
                 </div>
             </div>
