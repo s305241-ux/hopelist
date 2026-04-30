@@ -598,7 +598,8 @@
                         <option value="">なし</option>
                         <option value="name">氏名</option>
                         <option value="prefecture">都道府県</option>
-                        <option value="combined">住所</option>
+                        <option value="city">市町村</option>
+                        <option value="ward">区</option>
                     </select>
                 </label>
             </div>
@@ -1015,12 +1016,10 @@
                 sortedFriends.sort((a, b) => a.name.localeCompare(b.name, 'ja'));
             } else if (sortColumn === 'prefecture') {
                 sortedFriends.sort((a, b) => a.prefecture.localeCompare(b.prefecture, 'ja'));
-            } else if (sortColumn === 'combined') {
-                sortedFriends.sort((a, b) => {
-                    const addrA = (a.prefecture || '') + (a.city || '') + (a.ward || '');
-                    const addrB = (b.prefecture || '') + (b.city || '') + (b.ward || '');
-                    return addrA.localeCompare(addrB, 'ja');
-                });
+            } else if (sortColumn === 'city') {
+                sortedFriends.sort((a, b) => (a.city || '').localeCompare(b.city || '', 'ja'));
+            } else if (sortColumn === 'ward') {
+                sortedFriends.sort((a, b) => (a.ward || '').localeCompare(b.ward || '', 'ja'));
             }
 
             let html = '<div class="table-wrapper"><table><thead><tr>';
