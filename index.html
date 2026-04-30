@@ -257,6 +257,10 @@
             gap: 0.5rem;
         }
 
+        .table-actions .btn {
+            width: auto;
+        }
+
         /* ===== テーブル ===== */
         .table-wrapper {
             overflow-x: auto;
@@ -321,23 +325,25 @@
         }
 
         .circle-btn {
-            width: 32px;
-            height: 32px;
+            width: 38px;
+            height: 38px;
             border: 2px solid #3b82f6;
             border-radius: 50%;
-            background: transparent;
+            background: rgba(59, 130, 246, 0.08);
             color: #3b82f6;
             cursor: pointer;
             font-weight: bold;
-            transition: all 0.3s;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.15);
         }
 
         .circle-btn.checked {
             background: #3b82f6;
             color: white;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.35);
         }
 
         .circle-btn:hover {
