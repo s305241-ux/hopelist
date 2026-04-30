@@ -250,6 +250,13 @@
             cursor: pointer;
         }
 
+        .table-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 1rem;
+            gap: 0.5rem;
+        }
+
         /* ===== テーブル ===== */
         .table-wrapper {
             overflow-x: auto;
@@ -560,7 +567,6 @@
                 </div>
                 <div class="action-buttons">
                     <button class="btn btn-sm btn-add" onclick="openAddModal()">➕ 友人を追加</button>
-                    <button class="btn btn-sm btn-config" onclick="openConfigModal()">⚙️ 列設定</button>
                     <button class="btn btn-sm btn-logout" onclick="handleLogout()">ログアウト</button>
                 </div>
             </div>
@@ -574,6 +580,10 @@
                         <option value="combined">住所</option>
                     </select>
                 </label>
+            </div>
+
+            <div class="table-actions">
+                <button class="btn btn-sm btn-config" onclick="openConfigModal()">⚙️ 列設定</button>
             </div>
 
             <div id="table-container"></div>
@@ -1003,7 +1013,7 @@
             if (cols.action3 !== false) html += `<th>${config.action3}</th>`;
             if (cols.action4 !== false) html += `<th>${config.action4}</th>`;
             if (cols.memo !== false) html += `<th>備考</th>`;
-            html += `<th>操作</th></tr></thead><tbody>`;
+            html += `<th></th></tr></thead><tbody>`;
 
             // データ行
             let totals = {
