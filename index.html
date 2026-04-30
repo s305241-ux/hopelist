@@ -17,6 +17,7 @@
             color: #e2e8f0;
             line-height: 1.6;
             min-height: 100vh;
+            writing-mode: horizontal-tb;
         }
 
         /* ===== ログイン画面 ===== */
@@ -495,26 +496,76 @@
 
         /* ===== レスポンシブ ===== */
         @media (max-width: 768px) {
+            .container {
+                padding: 0.5rem;
+            }
+
             .header {
                 flex-direction: column;
                 align-items: flex-start;
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .user-info #username-display {
+                font-size: 1.1rem;
             }
 
             .action-buttons {
                 width: 100%;
+                justify-content: flex-end;
             }
 
             .action-buttons button {
-                flex: 1;
-                min-width: 0;
+                flex: none;
+                min-width: auto;
+            }
+
+            .sort-bar {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 0.75rem;
+                margin-bottom: 1rem;
+            }
+
+            .sort-bar select {
+                width: 100%;
+            }
+
+            .table-action-row {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+
+            .table-action-row .btn-add {
+                justify-self: stretch;
+                order: 1;
+            }
+
+            .table-action-row .btn-config {
+                justify-self: stretch;
+                order: 2;
             }
 
             table {
-                font-size: 0.8rem;
+                font-size: 0.75rem;
+                min-width: 800px;
             }
 
             th, td {
-                padding: 0.5rem 0.25rem;
+                padding: 0.4rem 0.2rem;
+                white-space: nowrap;
+            }
+
+            .circle-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 0.8rem;
+            }
+
+            .icon-btn {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.8rem;
             }
 
             .form-row,
@@ -522,13 +573,14 @@
                 grid-template-columns: 1fr;
             }
 
-            .sort-bar {
-                flex-direction: column;
-                align-items: stretch;
+            .modal-content {
+                margin: 0.5rem;
+                padding: 1.5rem;
+                max-height: 90vh;
             }
 
-            .sort-bar select {
-                width: 100%;
+            .modal-header h2 {
+                font-size: 1.25rem;
             }
         }
     </style>
