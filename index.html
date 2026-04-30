@@ -257,7 +257,14 @@
             gap: 0.5rem;
         }
 
-        .table-actions .btn {
+        .table-add-row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .table-actions .btn,
+        .table-add-row .btn {
             width: auto;
         }
 
@@ -572,7 +579,6 @@
                     <span>👤 <span id="username-display"></span></span>
                 </div>
                 <div class="action-buttons">
-                    <button class="btn btn-sm btn-add" onclick="openAddModal()">➕ 友人を追加</button>
                     <button class="btn btn-sm btn-logout" onclick="handleLogout()">ログアウト</button>
                 </div>
             </div>
@@ -586,6 +592,10 @@
                         <option value="combined">住所</option>
                     </select>
                 </label>
+            </div>
+
+            <div class="table-add-row">
+                <button class="btn btn-sm btn-add" onclick="openAddModal()">➕ 友人を追加</button>
             </div>
 
             <div class="table-actions">
