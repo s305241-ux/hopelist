@@ -887,8 +887,39 @@
             }
         }
 
+        const sharedUsers = {
+            'hopeuser': 'hope123',
+            'admin': 'admin123'
+        };
+
         function getStorageKey(username) {
             return `hopelist_${username}`;
+        }
+
+        function getSharedUserData(username) {
+            if (!sharedUsers[username]) return null;
+            return {
+                password: sharedUsers[username],
+                friends: [],
+                config: {
+                    action1: '電話',
+                    action2: 'メール',
+                    action3: 'SNS',
+                    action4: '備考',
+                    columns: {
+                        name: true,
+                        phone: true,
+                        prefecture: true,
+                        city: true,
+                        ward: true,
+                        action1: true,
+                        action2: true,
+                        action3: true,
+                        action4: true,
+                        memo: true
+                    }
+                }
+            };
         }
 
         // ===== 認証関数 =====
@@ -911,13 +942,22 @@
                     return;
                 }
 
-                const stored = localStorage.getItem(getStorageKey(username));
-                if (!stored) {
+                let stored = localStorage.getItem(getStorageKey(username));
+                let userData = null;
+
+                if (stored) {
+                    userData = JSON.parse(simpleDecrypt(stored));
+                } else if (sharedUsers[username] && sharedUsers[username] === password) {
+                    userData = getSharedUserData(username);
+                    // クロスブラウザ環境でも同じ初期アカウントを使えるように保存しておく
+                    localStorage.setItem(getStorageKey(username), simpleEncrypt(JSON.stringify(userData)));
+                }
+
+                if (!userData) {
                     alert('ユーザーが見つかりません。');
                     return;
                 }
 
-                const userData = JSON.parse(simpleDecrypt(stored));
                 if (userData.password === password) {
                     sessionStorage.setItem('currentUser', username);
                     loadDashboard();
@@ -1037,7 +1077,10 @@
         function getUserData() {
             const username = sessionStorage.getItem('currentUser');
             const stored = localStorage.getItem(getStorageKey(username));
-            return JSON.parse(simpleDecrypt(stored));
+            if (stored) {
+                return JSON.parse(simpleDecrypt(stored));
+            }
+            return getSharedUserData(username) || { password: '', friends: [], config: { action1: '電話', action2: 'メール', action3: 'SNS', action4: '備考', columns: { name: true, phone: true, prefecture: true, city: true, ward: true, action1: true, action2: true, action3: true, action4: true, memo: true } } };
         }
 
         function saveUserData(data) {
